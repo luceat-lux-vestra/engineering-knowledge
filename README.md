@@ -95,6 +95,7 @@ A. ...
 
 ## Initial knowledge set — 2026-08
 
+- [Agent Context Engineering](concepts/agent-context-engineering.md)
 - [Virtual Threads](concepts/virtual-threads.md)
 - [Random Access Parquet](concepts/random-access-parquet.md)
 - [Progressive Collapse](concepts/progressive-collapse.md)
