@@ -1,6 +1,6 @@
 # Durable Workflow
 
-- Status: seed
+- Status: learning
 - Added: 2026-11-17
 - Source month: 2026-07~08
 
@@ -81,6 +81,32 @@ Spring Batch / OxideBatch
 
 > 처리할 **데이터가 주인공이면 Batch**, 진행 중인 **업무 상태가 주인공이면 Durable Workflow**.
 
+## Durable runtime과 빠른 eval runtime은 분리할 수 있다
+
+Durability를 얻으려면 production runtime은 보통 각 step의 상태·결과·retry 정보 등을 저장하고, 필요하면 task를 분산하고, crash/restart 후 실행을 복원해야 한다.
+
+이 machinery는 production에서는 가치가 있지만 **빠르게 수십~수백 번 돌려보는 local test/evaluation loop에서는 오히려 비용**이 될 수 있다.
+
+특히 AI workflow처럼 결과 품질을 반복 평가해야 하는 경우:
+
+```text
+Workflow business logic
+        │
+        ├─ production
+        │    └─ durable runtime
+        │         persistence / retry / distribution / recovery
+        │
+        └─ local eval
+             └─ lightweight runtime
+                  fast reset / fast iteration
+```
+
+처럼 **workflow 정의와 execution runtime을 분리**하면 같은 논리 흐름을 서로 다른 실행 환경에서 사용할 수 있다.
+
+핵심은 durability를 제거하는 것이 아니라, durability 관련 infrastructure concern이 business workflow 자체에 과도하게 침투하지 않도록 경계를 두는 것이다.
+
+이 관점은 batch framework에도 연결된다. restart/checkpoint semantics는 보존하되, workload의 핵심 처리 로직과 metadata persistence/runtime 구현이 지나치게 결합되면 테스트와 대체 runtime 구성이 어려워질 수 있다.
+
 ## 헷갈리는 점
 
 - Temporal의 event replay와 DBOS의 step checkpoint가 failure semantics에서 정확히 어떻게 다른가?
@@ -97,6 +123,12 @@ A. 여러 시스템·긴 시간·대기·재시도를 하나의 ACID transaction
 
 Q. OxideBatch와 가장 큰 차이는?  
 A. OxideBatch는 bounded dataset processing의 restartability가 중심이고, Temporal/DBOS는 business process execution의 지속성이 중심이다.
+
+Q. Production durability와 local evaluation이 왜 충돌할 수 있는가?  
+A. persistence·distribution·recovery machinery는 production 안정성에는 필요하지만, 반복 실행이 중요한 eval loop에는 실행 비용과 초기화 복잡성을 추가하기 때문이다.
+
+Q. 이를 완화하는 설계 방향은?  
+A. workflow business logic과 durable execution runtime을 분리해 같은 논리를 lightweight/durable runtime에서 각각 실행할 수 있게 하는 것이다.
 
 ## Related
 
