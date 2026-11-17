@@ -102,3 +102,17 @@ A. ...
 - [Idempotent Synchronization](patterns/idempotent-synchronization.md)
 - [State-Space Remediation](patterns/state-space-remediation.md)
 - [Durable Workflow](systems/durable-workflow.md)
+
+
+## Knowledge set — 2026-09
+
+- [Telemetry Signal vs Volume](concepts/telemetry-signal-vs-volume.md)
+- [Backlog Depth vs Age](concepts/backlog-depth-vs-age.md)
+- [Progressive Delivery for Foundational Platforms](patterns/progressive-delivery-for-foundational-platforms.md)
+- [Infrastructure State Boundaries](patterns/infrastructure-state-boundaries.md)
+- [Workload-Specialized Storage](patterns/workload-specialized-storage.md)
+
+Updated existing notes:
+
+- [Durable Workflow](systems/durable-workflow.md) — Postgres durable execution and Netflix Conductor scaling
+- [Agent Context Engineering](concepts/agent-context-engineering.md) — durable receipts and context compression
