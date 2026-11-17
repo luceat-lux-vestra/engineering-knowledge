@@ -2,7 +2,7 @@
 
 - Status: learning
 - Added: 2026-11-17
-- Source month: 2026-08~09
+- Source month: 2026-08~10
 
 ## 한 줄 요약
 
@@ -160,6 +160,35 @@ learned gist tokens
 
 이 셋을 같은 문제로 취급하지 않는 것이 중요하다.
 
+## Agent output이 빨라지면 downstream verification이 병목이 될 수 있다
+
+Coding agent가 code 생성 속도를 높여도 software delivery 전체 throughput이 같은 비율로 늘어나는 것은 아니다.
+
+AI-assisted development 연구에서는 code/commit/PR volume이 증가해도 completed work 증가폭은 더 작고, review workload와 downstream coordination이 새로운 병목이 될 수 있다는 결과가 보고됐다.
+
+이를 queue 관점으로 보면:
+
+~~~text
+agent coding capacity ↑↑
+        ↓
+PR arrival rate ↑
+        ↓
+human review / CI / integration capacity 그대로
+        ↓
+queueing / rework / review delay ↑
+~~~
+
+따라서 agent productivity는 "얼마나 많은 코드를 생성했는가"보다 다음을 같이 봐야 한다.
+
+- accepted change throughput
+- review latency
+- rework rate
+- escaped regression
+- CI load
+- rollback / incident cost
+
+이 관점은 agent harness 설계와도 연결된다. 모델이 더 많은 변경을 만들게 하는 것보다 **verification capacity 안에서 작고 검증 가능한 작업을 공급하는 것**이 전체 시스템 throughput에 더 중요할 수 있다.
+
 ## 헷갈리는 점
 
 - session을 언제 끊고 새 context로 시작하는 것이 좋은가?
@@ -199,3 +228,5 @@ A. 병렬 agent의 filesystem state를 격리해 서로의 미완성 변경을 c
   https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
 - Shopify Engineering, *Gisting: Compressing LLM Agent context to ↑ throughput and ↓ cost*  
   https://shopify.engineering/gisting
+- InfoQ, *Study Finds AI-generated Code Fails to Boost Productivity Due to Downstream Bottlenecks*  
+  https://www.infoq.com/news/2026/10/jellyfish-ai-productivity/
