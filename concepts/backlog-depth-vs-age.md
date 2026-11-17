@@ -1,8 +1,8 @@
 # Backlog Depth vs Age
 
-- Status: seed
+- Status: learning
 - Added: 2026-11-18
-- Source month: 2026-09
+- Source month: 2026-09~10
 
 ## 한 줄 요약
 
@@ -73,6 +73,54 @@ time in queue
 
 이 패턴은 Hudi에만 국한되지 않는다. 처리 시스템이 "마지막으로 확정된 위치"를 알 수 있다면 oldest pending data의 age를 별도 관측할 수 있다.
 
+## Zero lag는 recovery verdict가 아니다
+
+Backlog depth와 age가 0으로 돌아왔다는 것은 **position movement가 끝났다는 신호**이지, business state가 정상으로 수렴했다는 증거는 아니다.
+
+예를 들어 Kafka recovery에서:
+
+~~~text
+consumer lag = 0
+error rate = normal
+~~~
+
+이어도 다음은 남아 있을 수 있다.
+
+- 중복 side effect
+- 일부 record의 silent skip
+- DLQ / quarantine
+- projection drift
+- source-of-truth와 downstream state 불일치
+
+따라서 recovery run은 "몇 건 처리했는가"보다 terminal outcome을 account해야 한다.
+
+~~~text
+expected
+=
+APPLIED
++ UPDATED
++ SKIPPED
++ DUPLICATE_SUPPRESSED
++ FAILED_FINAL
++ QUARANTINED
+~~~
+
+retry 중인 record는 아직 terminal이 아니다.
+
+마지막에는 source-of-truth와 reconciliation을 수행해 명시적인 recovery verdict를 내려야 한다.
+
+~~~text
+movement complete
+        ↓
+terminal outcomes close
+        ↓
+reconciliation
+        ↓
+CLEAR / FAILED
+~~~
+
+핵심은 **progress metric과 correctness verdict를 분리**하는 것이다.
+
 ## 헷갈리는 점
 
 - 여러 partition이 있을 때 max age만 볼지 percentile도 볼지?
@@ -102,3 +150,5 @@ A. queue depth와 oldest message age를 별도 지표로 보라는 것이다.
 
 - InfoQ, *Beyond Offset Lag: Computing Time in Queue for Apache Hudi Data Lake Pipelines at Petabyte Scale*  
   https://www.infoq.com/articles/beyond-offset-lag-kafka-apache-hudi/
+- DZone, *Consumer Lag Is the Wrong Finish Line*  
+  https://dzone.com/articles/consumer-lag-recovery
