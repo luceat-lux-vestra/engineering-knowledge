@@ -1,8 +1,8 @@
 # Agent Context Engineering
 
-- Status: seed
+- Status: learning
 - Added: 2026-11-17
-- Source month: 2026-08
+- Source month: 2026-08~09
 
 ## 한 줄 요약
 
@@ -103,6 +103,63 @@ Agent
 
 즉 **storage capacity와 active context capacity를 분리**해서 생각한다.
 
+## Durable receipt: 다음 session이 상태를 재구성할 수 있어야 한다
+
+긴 작업에서 중요한 것은 모델이 이전 session을 "기억하는 것"이 아니라 **fresh session이 외부 artifact만 보고 현재 상태를 재구성할 수 있는 것**이다.
+
+Anthropic의 long-running agent harness 사례에서는 다음과 같은 artifact를 사용했다.
+
+~~~text
+feature list
+progress file
+git history
+test result
+init script
+~~~
+
+각 session은:
+
+~~~text
+현재 상태 읽기
+→ 아직 끝나지 않은 feature 하나 선택
+→ 구현
+→ end-to-end 검증
+→ progress file 갱신
+→ commit
+~~~
+
+처럼 동작한다.
+
+좋은 checkpoint/receipt의 판단 기준은 단순하다.
+
+> 이전 대화와 모델 memory를 전혀 주지 않아도, 새 session이 artifact만 읽고 무엇이 끝났고 무엇이 남았는지 정확히 복원할 수 있는가?
+
+이런 receipt는 context compaction의 대체물이 아니라 **session boundary를 견디는 durable state**다.
+
+## Context compression은 retrieval과 다른 최적화다
+
+필요한 정보를 선택해서 넣는 것 외에, 반복되는 긴 system context 자체를 더 짧은 representation으로 바꾸는 방법도 있다.
+
+Shopify의 Gisting 사례에서는 약 6,000 token system prompt를 약 1,500 learned gist token으로 압축하면서 같은 behavior를 유지하도록 학습했다.
+
+이건 일반적인 요약과 다르다.
+
+~~~text
+full prompt
+   ↓ teacher behavior
+learned gist tokens
+   ↓
+같은 behavior를 최대한 재현
+~~~
+
+따라서 context engineering에는 서로 다른 층이 있다.
+
+- 무엇을 넣을지 고르는 retrieval / selection
+- session 간 상태를 남기는 durable receipt
+- 반복되는 고정 context를 줄이는 compression
+
+이 셋을 같은 문제로 취급하지 않는 것이 중요하다.
+
 ## 헷갈리는 점
 
 - session을 언제 끊고 새 context로 시작하는 것이 좋은가?
@@ -138,3 +195,7 @@ A. 병렬 agent의 filesystem state를 격리해 서로의 미완성 변경을 c
 - InfoQ / QCon London, *The Right 300 Tokens Beat 100k Noisy Ones: The Architecture of Context Engineering*  
   https://www.infoq.com/presentations/architecture-context-engineering/
 - Educative newsletter, *Why your coding agent breaks at turn 50* (2026-08-29)
+- Anthropic Engineering, *Effective harnesses for long-running agents*  
+  https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents
+- Shopify Engineering, *Gisting: Compressing LLM Agent context to ↑ throughput and ↓ cost*  
+  https://shopify.engineering/gisting
