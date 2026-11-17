@@ -116,3 +116,22 @@ Updated existing notes:
 
 - [Durable Workflow](systems/durable-workflow.md) — Postgres durable execution and Netflix Conductor scaling
 - [Agent Context Engineering](concepts/agent-context-engineering.md) — durable receipts and context compression
+
+
+## Knowledge set — 2026-10
+
+- [Structured Concurrency](concepts/structured-concurrency.md)
+- [DPoP and Sender-Constrained Tokens](concepts/dpop-and-sender-constrained-tokens.md)
+- [Reproducible Builds](concepts/reproducible-builds.md)
+- [Formal Methods Thinking](concepts/formal-methods-thinking.md)
+- [Object Storage as a Durable Log](patterns/object-storage-durable-log.md)
+- [End-to-End Latency Optimization](patterns/end-to-end-latency-optimization.md)
+
+Updated existing notes:
+
+- [Backlog Depth vs Age](concepts/backlog-depth-vs-age.md) — zero lag vs recovery verdict
+- [Agent Context Engineering](concepts/agent-context-engineering.md) — downstream verification bottlenecks
+
+Promotion candidate, not yet created in R2A:
+
+- Distributed batch with database-only coordination — Spring Batch brokerless partitioning as evidence for an OxideBatch experiment
