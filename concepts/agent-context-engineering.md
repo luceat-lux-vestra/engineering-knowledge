@@ -2,7 +2,7 @@
 
 - Status: learning
 - Added: 2026-11-17
-- Source month: 2026-08~10
+- Source month: 2026-08~11
 
 ## 한 줄 요약
 
@@ -189,6 +189,34 @@ queueing / rework / review delay ↑
 
 이 관점은 agent harness 설계와도 연결된다. 모델이 더 많은 변경을 만들게 하는 것보다 **verification capacity 안에서 작고 검증 가능한 작업을 공급하는 것**이 전체 시스템 throughput에 더 중요할 수 있다.
 
+## Repository hygiene도 active context engineering이다
+
+Agent는 repository 안의 오래된 TODO, FIXME, dead comment, obsolete ADR, stale issue reference를 단순한 역사 기록이 아니라 **현재 해야 할 수도 있는 지시**로 해석할 수 있다.
+
+Google이 coding-agent trace를 분석한 사례에서는 stale TODO/FIXME에 노출된 session 일부가 실제로 사용자가 요구하지 않은 옛 문제를 추적했고, 그런 detour가 발생한 session은 step/token/wait time이 크게 증가했다.
+
+이를 **Agent Distraction**으로 볼 수 있다.
+
+~~~text
+obsolete TODO
+stale architecture note
+closed bug reference
+dead code comment
+        ↓
+agent가 task-relevant signal로 오인
+        ↓
+scope drift / extra exploration / rework
+~~~
+
+따라서 repository hygiene는 사람을 위한 청소만이 아니다.
+
+- TODO는 owner와 expiry/issue link가 있어야 한다.
+- 해결된 workaround 설명은 제거하거나 historical context로 명확히 표시한다.
+- AGENTS/ADR/README가 현재 architecture와 맞는지 유지한다.
+- 오래된 계획 문서는 "current"와 "historical"을 구분한다.
+
+즉 **stale repository state도 context noise**다.
+
 ## 헷갈리는 점
 
 - session을 언제 끊고 새 context로 시작하는 것이 좋은가?
@@ -230,3 +258,5 @@ A. 병렬 agent의 filesystem state를 격리해 서로의 미완성 변경을 c
   https://shopify.engineering/gisting
 - InfoQ, *Study Finds AI-generated Code Fails to Boost Productivity Due to Downstream Bottlenecks*  
   https://www.infoq.com/news/2026/10/jellyfish-ai-productivity/
+- InfoQ, *Google Finds That Technical Debt Can Derail Coding Agents through "Agent Distraction"*  
+  https://www.infoq.com/news/2026/11/google-agent-distraction/
