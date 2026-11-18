@@ -1,8 +1,8 @@
 # Idempotent Synchronization
 
-- Status: seed
+- Status: learning
 - Added: 2026-11-17
-- Source month: 2026-08
+- Source month: 2026-08~11
 
 ## 한 줄 요약
 
@@ -60,6 +60,36 @@ hash comparison
 full compare
 ```
 
+## Check-then-act는 concurrency correctness가 아니다
+
+Application에서 먼저 존재 여부를 확인해도 concurrent consumer 사이에서는 race가 남는다.
+
+~~~text
+worker A: exists(event_id)? false
+worker B: exists(event_id)? false
+
+worker A: insert
+worker B: insert
+~~~
+
+따라서:
+
+~~~text
+application pre-check
+= 불필요한 insert를 줄이는 optimization
+
+UNIQUE(event_id)
+= correctness invariant
+~~~
+
+로 역할을 나누는 편이 안전하다.
+
+중복 insert가 UNIQUE constraint에서 충돌하는 것은 예상 가능한 duplicate path로 처리할 수 있다.
+
+핵심은 **중복을 막는 최종 권한을 concurrency-safe storage primitive에 두는 것**이다.
+
+Redis SETNX나 application lock도 상황에 따라 쓸 수 있지만, 최종 business row가 관계형 DB에 authoritative하게 저장된다면 그 DB의 UNIQUE/PK constraint와 transaction boundary가 실제 invariant를 보장하는지 확인해야 한다.
+
 ## 헷갈리는 점
 
 - entity마다 ownership을 나누는 경우 cross-entity transaction은 어떻게 다뤄야 하는가?
@@ -88,3 +118,5 @@ A. drift metric, heartbeat, DLQ, audit/observability 같은 별도 탐지 경로
 
 - DZone, *Designing a Reliable Data Synchronization Layer: Idempotency, Ownership, and Observability*  
   https://dzone.com/articles/data-sync-design
+- DZone, *Idempotency Under Concurrency: Why Your Application Check Isn't the Last Line of Defense*  
+  https://dzone.com/articles/idempotency-under-concurrency
