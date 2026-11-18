@@ -1,0 +1,94 @@
+name: Quartz Pages
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "concepts/**"
+      - "patterns/**"
+      - "systems/**"
+      - "site/**"
+      - ".github/workflows/quartz-pages.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "README.md"
+      - "concepts/**"
+      - "patterns/**"
+      - "systems/**"
+      - "site/**"
+      - ".github/workflows/quartz-pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "quartz-pages-\${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout engineering knowledge
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Checkout pinned Quartz 5
+        uses: actions/checkout@v6
+        with:
+          repository: jackyzha0/quartz
+          ref: 7cfb0796165c848be5438117e9806802123bf676
+          path: .quartz-src
+
+      - name: Project EK content into Quartz
+        shell: bash
+        run: |
+          set -euo pipefail
+          find .quartz-src/content -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+          cp README.md .quartz-src/content/index.md
+          cp -R concepts .quartz-src/content/concepts
+          cp -R patterns .quartz-src/content/patterns
+          cp -R systems .quartz-src/content/systems
+          cp site/quartz.config.yaml .quartz-src/quartz.config.yaml
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: .quartz-src/package-lock.json
+
+      - name: Install Quartz
+        working-directory: .quartz-src
+        run: npm ci
+
+      - name: Install configured Quartz plugins
+        working-directory: .quartz-src
+        run: npx quartz plugin install --from-config
+
+      - name: Build Quartz
+        working-directory: .quartz-src
+        run: npx quartz build
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .quartz-src/public
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    environment:
+      name: github-pages
+      url: \${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
