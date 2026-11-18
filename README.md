@@ -135,3 +135,23 @@ Updated existing notes:
 Promotion candidate, not yet created in R2A:
 
 - Distributed batch with database-only coordination — Spring Batch brokerless partitioning as evidence for an OxideBatch experiment
+
+
+## Knowledge set — 2026-11
+
+- [Verification Yield vs Accuracy](concepts/verification-yield-vs-accuracy.md)
+- [Deployment Convergence and Isolation](patterns/deployment-convergence-and-isolation.md)
+- [Technical Debt as Learning Debt](concepts/technical-debt-as-learning-debt.md)
+
+Updated existing notes:
+
+- [Idempotent Synchronization](patterns/idempotent-synchronization.md) — check-then-act race and database-enforced uniqueness
+- [Agent Context Engineering](concepts/agent-context-engineering.md) — repository hygiene and agent distraction
+- [Backlog Depth vs Age](concepts/backlog-depth-vs-age.md) — user-visible queue latency and distributed tracing
+
+Existing R2A owners enriched from November evidence:
+
+- #35 — concurrent idempotency / database invariant
+- #7 — agent distraction / context signal density
+- #62 — verification accuracy vs yield / correlated reviewers
+- #45 — MCP gateway production governance
