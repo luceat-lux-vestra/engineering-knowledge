@@ -2,7 +2,7 @@
 
 - Status: learning
 - Added: 2026-11-18
-- Source month: 2026-09~10
+- Source month: 2026-09~11
 
 ## 한 줄 요약
 
@@ -121,6 +121,59 @@ CLEAR / FAILED
 
 핵심은 **progress metric과 correctness verdict를 분리**하는 것이다.
 
+## Queue age보다 더 상위에는 user-visible latency가 있다
+
+Queue depth와 oldest-message age가 좋아도 사용자가 체감하는 전체 작업시간은 느릴 수 있다.
+
+Async pipeline은 보통:
+
+~~~text
+request
+  ↓
+enqueue
+  ↓
+queue wait
+  ↓
+worker execution
+  ↓
+downstream call
+  ↓
+completion
+~~~
+
+처럼 여러 구간으로 구성된다.
+
+따라서 관측 계층을 다음처럼 구분할 수 있다.
+
+~~~text
+depth
+= 몇 건 밀렸는가
+
+age
+= 가장 오래된 미처리 작업이 얼마나 기다렸는가
+
+end-to-end latency
+= 사용자가 요청한 뒤 business completion까지 얼마나 걸렸는가
+
+recovery verdict
+= 최종 business state가 실제로 정상으로 수렴했는가
+~~~
+
+OpenTelemetry trace context를 queue message와 함께 전달하면 enqueue 이전부터 worker/downstream completion까지 하나의 trace로 연결할 수 있다.
+
+이때 SLO는 queue size보다 실제 사용자 대기시간의 latency distribution을 기준으로 잡는 편이 더 직접적일 수 있다.
+
+즉 이 문서의 계층은:
+
+~~~text
+depth
+!= age
+!= user-visible end-to-end latency
+!= correctness / recovery verdict
+~~~
+
+다.
+
 ## 헷갈리는 점
 
 - 여러 partition이 있을 때 max age만 볼지 percentile도 볼지?
@@ -152,3 +205,5 @@ A. queue depth와 oldest message age를 별도 지표로 보라는 것이다.
   https://www.infoq.com/articles/beyond-offset-lag-kafka-apache-hudi/
 - DZone, *Consumer Lag Is the Wrong Finish Line*  
   https://dzone.com/articles/consumer-lag-recovery
+- InfoQ / QCon, *Uncorking Queueing Bottlenecks with OpenTelemetry*  
+  https://www.infoq.com/presentations/opentelemetry-queue-observability/
