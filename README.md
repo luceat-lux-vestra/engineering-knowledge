@@ -1,5 +1,7 @@
 # engineering-knowledge
 
+[![GitHub Stars](https://img.shields.io/github/stars/luceat-lux-vestra/engineering-knowledge?style=flat&label=Stars)](https://www.star-history.com/?repos=luceat-lux-vestra%2Fengineering-knowledge&type=date)
+
 개발/아키텍처 지식을 **이해하고 다시 떠올리기 위한 개인 지식 저장소**다.
 
 이 저장소는 기사 링크나 뉴스 요약을 쌓는 곳이 아니다. 같은 주제를 나중에 다시 봤을 때 빠르게 복원할 수 있도록, 개념을 자기 말로 정리하고 관련 소스를 누적한다.
