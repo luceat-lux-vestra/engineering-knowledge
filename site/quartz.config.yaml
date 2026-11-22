@@ -7,7 +7,7 @@ configuration:
   prefetch: viewport
   analytics: null
   locale: ko-KR
-  baseUrl: luceat-lux-vestra.github.io/engineering-knowledge
+  baseUrl: ek.ox0.uk
   ignorePatterns:
     - private
     - templates

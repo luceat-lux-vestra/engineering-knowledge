@@ -23,11 +23,13 @@ Pinned upstream commit:
 
 The pin is intentional. Updating Quartz should be a separate reviewed change with a successful build before changing this SHA.
 
-## Expected Pages URL
+## Canonical Pages URL
 
-`https://luceat-lux-vestra.github.io/engineering-knowledge/`
+`https://ek.ox0.uk/`
 
-The Quartz `baseUrl` includes the repository subpath so RSS/sitemap canonical URLs are correct.
+GitHub Pages remains the hosting platform, with `ek.ox0.uk` configured as the custom domain. Cloudflare provides DNS only for this hostname.
+
+The Quartz `baseUrl` is `ek.ox0.uk` so RSS, sitemap, and other canonical URLs are generated for the custom domain.
 
 ## One-time repository setting
 
