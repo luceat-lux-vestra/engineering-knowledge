@@ -97,7 +97,7 @@ A. ownership과 cleanup이 불명확해지고 failure/cancellation 누수가 생
 
 ## Related
 
-- Virtual Threads
+- [Virtual Threads](./virtual-threads.md)
 - ScopedValue
 - Cancellation
 - Fail-Fast
