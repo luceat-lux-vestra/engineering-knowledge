@@ -45,7 +45,7 @@ ox0
 이 저장소의 문서는 독립된 메모 묶음이 아니라 **연결된 knowledge graph**로 관리한다.
 
 1. 새 문서를 작성하거나 기존 문서를 보강할 때, 이미 존재하는 문서와 의미 있는 관계가 있으면 본문 문맥 안에서 내부 링크로 연결한다.
-2. 저장소가 소유하는 canonical 내부 링크는 GitHub와 Quartz에서 모두 읽히는 **상대경로 Markdown 링크**를 사용한다. 예: `[Virtual Threads](../concepts/virtual-threads.md)`.
+2. 저장소가 소유하는 canonical 내부 링크는 GitHub와 Quartz에서 모두 읽히는 **상대경로 Markdown 링크**를 사용한다. 예: `[Virtual Threads](concepts/virtual-threads.md)`.
 3. `## Related`는 보조 탐색 영역이다. 기존 문서 제목을 Related에 적을 경우 평문으로 두지 말고 실제 내부 링크로 만든다.
 4. backlink는 반대편 문서에 역링크를 중복 작성해서 만드는 것이 아니다. 실제 한쪽의 의미 있는 링크에서 Quartz가 파생한다.
 5. graph 밀도를 높이기 위한 억지 링크나 "문서당 최소 N개 링크" 규칙은 두지 않는다. 관계가 없으면 링크가 없어도 된다.
