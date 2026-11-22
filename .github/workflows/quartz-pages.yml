@@ -8,6 +8,8 @@ on:
       - "patterns/**"
       - "systems/**"
       - "site/**"
+      - ".quartz-src"
+      - ".gitmodules"
       - ".github/scripts/validate-knowledge-links.cjs"
       - ".github/workflows/quartz-pages.yml"
   push:
@@ -19,6 +21,8 @@ on:
       - "patterns/**"
       - "systems/**"
       - "site/**"
+      - ".quartz-src"
+      - ".gitmodules"
       - ".github/scripts/validate-knowledge-links.cjs"
       - ".github/workflows/quartz-pages.yml"
 
@@ -35,17 +39,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout engineering knowledge
+      - name: Checkout engineering knowledge and Quartz submodule
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-
-      - name: Checkout pinned Quartz 5
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: jackyzha0/quartz
-          ref: 7cfb0796165c848be5438117e9806802123bf676
-          path: .quartz-src
+          submodules: recursive
 
       - name: Project EK content into Quartz
         shell: bash
