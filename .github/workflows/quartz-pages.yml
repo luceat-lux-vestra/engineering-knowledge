@@ -8,6 +8,7 @@ on:
       - "patterns/**"
       - "systems/**"
       - "site/**"
+      - ".github/scripts/validate-knowledge-links.cjs"
       - ".github/workflows/quartz-pages.yml"
   push:
     branches:
@@ -18,6 +19,7 @@ on:
       - "patterns/**"
       - "systems/**"
       - "site/**"
+      - ".github/scripts/validate-knowledge-links.cjs"
       - ".github/workflows/quartz-pages.yml"
 
 permissions:
@@ -62,6 +64,9 @@ jobs:
           node-version: 'lts/*'
           cache: npm
           cache-dependency-path: .quartz-src/package-lock.json
+
+      - name: Validate knowledge links
+        run: node .github/scripts/validate-knowledge-links.cjs README.md concepts patterns systems
 
       - name: Install Quartz
         working-directory: .quartz-src
