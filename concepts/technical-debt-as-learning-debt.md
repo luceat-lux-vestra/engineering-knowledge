@@ -107,7 +107,7 @@ A. implementation 속도가 팀의 이해와 ownership 형성 속도보다 빨�
 ## Related
 
 - Architecture Evolution
-- Agent Context Engineering
+- [Agent Context Engineering](./agent-context-engineering.md)
 - Documentation
 - ADR
 - Sociotechnical Systems
