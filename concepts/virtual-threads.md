@@ -66,7 +66,7 @@ A. 아니다. streaming/SSE/WebSocket처럼 backpressure가 중요한 모델은 
 
 ## Related
 
-- Progressive Collapse
+- [Progressive Collapse](./progressive-collapse.md)
 - Backpressure
 - Connection Pool
 - Load Shedding
