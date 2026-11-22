@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabledManagers": [
+    "custom.regex"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github\\/workflows\\/quartz-pages\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+) versioning=(?<versioning>\\S+)\\n(?<indentation>\\s*)ref:\\s*(?<currentDigest>[0-9a-f]{40})\\s+#\\s+(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}} versioning={{{versioning}}}\n{{{indentation}}}ref: {{{newDigest}}} # {{{newValue}}}"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchPackageNames": [
+        "jackyzha0/quartz"
+      ],
+      "ignoreUnstable": true,
+      "automerge": false
+    }
+  ]
+}

@@ -44,7 +44,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: jackyzha0/quartz
-          ref: 7cfb0796165c848be5438117e9806802123bf676
+          # renovate: datasource=github-releases depName=jackyzha0/quartz versioning=semver-coerced
+          ref: 568004496b900c5b365d3366b2521309952622be # v5.2.0
           path: .quartz-src
 
       - name: Project EK content into Quartz
