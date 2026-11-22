@@ -99,7 +99,7 @@ A. 작은 blast radius를 유지하면서 시간에 따라 드러나는 문제�
 
 ## Related
 
-- Progressive Collapse
+- [Progressive Collapse](../concepts/progressive-collapse.md)
 - Canary Deployment
 - Synthetic Monitoring
 - Blast Radius

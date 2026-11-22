@@ -111,7 +111,7 @@ A. 아니다. model/context/failure mode가 correlated할 수 있으므로 독�
 
 ## Related
 
-- Agent Context Engineering
+- [Agent Context Engineering](./agent-context-engineering.md)
 - Evaluation
 - LLM-as-a-Judge
 - Independent Evidence

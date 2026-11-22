@@ -97,7 +97,7 @@ A. streaming architecture도 workload latency budget에 따라 storage substrate
 ## Related
 
 - Kafka
-- Durable Workflow
+- [Durable Workflow](../systems/durable-workflow.md)
 - Event Streaming
 - Storage Tiering
 - Backlog Age
