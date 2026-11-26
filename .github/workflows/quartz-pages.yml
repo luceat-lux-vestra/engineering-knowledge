@@ -2,16 +2,6 @@ name: Quartz Pages
 
 on:
   pull_request:
-    paths:
-      - "README.md"
-      - "concepts/**"
-      - "patterns/**"
-      - "systems/**"
-      - "site/**"
-      - ".quartz-src"
-      - ".gitmodules"
-      - ".github/scripts/validate-knowledge-links.cjs"
-      - ".github/workflows/quartz-pages.yml"
   push:
     branches:
       - main
@@ -23,13 +13,11 @@ on:
       - "site/**"
       - ".quartz-src"
       - ".gitmodules"
-      - ".github/scripts/validate-knowledge-links.cjs"
+      - ".github/scripts/**"
       - ".github/workflows/quartz-pages.yml"
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "quartz-pages-${{ github.ref }}"
@@ -38,37 +26,36 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - name: Checkout engineering knowledge and Quartz submodule
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           submodules: recursive
-
-      - name: Project EK content into Quartz
-        shell: bash
-        run: |
-          set -euo pipefail
-          find .quartz-src/content -mindepth 1 -maxdepth 1 -exec rm -rf {} +
-          cp README.md .quartz-src/content/index.md
-          cp -R concepts .quartz-src/content/concepts
-          cp -R patterns .quartz-src/content/patterns
-          cp -R systems .quartz-src/content/systems
-          cp site/quartz.config.yaml .quartz-src/quartz.config.yaml
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 'lts/*'
+          check-latest: true
           cache: npm
           cache-dependency-path: .quartz-src/package-lock.json
-
-      - name: Validate knowledge links
-        run: node .github/scripts/validate-knowledge-links.cjs README.md concepts patterns systems
 
       - name: Install Quartz
         working-directory: .quartz-src
         run: npm ci
+
+      - name: Test knowledge validation and projection
+        run: node --test .github/scripts/project-knowledge.test.mjs
+
+      - name: Validate and project knowledge
+        run: |
+          node .github/scripts/project-knowledge.mjs
+          cp site/quartz.config.yaml .quartz-src/quartz.config.yaml
 
       - name: Install configured Quartz plugins
         working-directory: .quartz-src
@@ -91,6 +78,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

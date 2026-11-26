@@ -110,7 +110,7 @@ A. 있다. failure/interleaving 질문 자체가 설계 결함을 조기에 드�
 - State Machine
 - Idempotency
 - Distributed Systems
-- Progressive Collapse
+- [Progressive Collapse](./progressive-collapse.md)
 - Recovery Semantics
 
 ## Sources

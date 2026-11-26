@@ -17,11 +17,13 @@ No knowledge document is moved or duplicated in the repository.
 
 ## Quartz version
 
-Pinned upstream commit:
-
-`7cfb0796165c848be5438117e9806802123bf676`
-
-The pin is intentional. Updating Quartz should be a separate reviewed change with a successful build before changing this SHA.
+The Git submodule gitlink `.quartz-src` is the sole immutable source revision.
+Inspect it with `git ls-tree HEAD .quartz-src`. The approved upstream channel
+is the `v5` branch in `.gitmodules`; native Dependabot `gitsubmodule` manages
+reviewed gitlink updates, and `github-actions` manages Action SHAs. A submodule
+PR must pass the same full Quartz validation as any other PR. Do not copy the
+current SHA into documentation or introduce another updater. Node uses the
+provider's newest LTS selector with `check-latest: true`; runner `ubuntu-latest`.
 
 ## Canonical Pages URL
 
@@ -37,7 +39,15 @@ GitHub Pages must use **GitHub Actions** as its source:
 
 `Settings → Pages → Build and deployment → Source → GitHub Actions`
 
-The workflow validates the Quartz build on pull requests, but deploys only on pushes to `main`.
+The workflow validates all pull requests using a read-only build job. The
+projection script validates and copies only the Markdown knowledge inventory
+(README becomes index.md) using the pinned Quartz parser; tests include
+broken links, Related relationships and projection isolation. Only changes to
+publication inputs on `main` trigger deployment. Only the deploy job receives
+Pages/OIDC write permissions. Successful current-composition PR build is a
+repository merge obligation even when live GitHub settings do not enforce it.
+Actual Pages settings and deployed output must be checked when claiming
+publication success; historical CI does not prove current settings.
 
 ## Current scope
 
