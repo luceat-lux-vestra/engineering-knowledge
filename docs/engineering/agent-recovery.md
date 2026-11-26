@@ -47,7 +47,7 @@ declared stop condition, or stop early on pending, conflict, failure or material
 unknown. Never replay a lost response blindly. Audit comprehensively before
 editing; consolidate replacements and affected consumers/tests/docs.
 
-## Exact-HEAD and same-HEAD evidence after base advancement
+## Same-HEAD evidence after base advancement
 
 Any changed PR HEAD invalidates prior HEAD-specific CI/review proof. Do not
 relabel a synthetic merge run as HEAD-only proof. Before merge, fresh-read the
