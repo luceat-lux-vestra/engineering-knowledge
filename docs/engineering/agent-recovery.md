@@ -1,164 +1,82 @@
 # Crash-Recoverable Agent Work
 
-This document defines repository-operation recovery after an agent session, connection, harness, or process interruption in `luceat-lux-vestra/engineering-knowledge`.
+Repository-local recovery authority for engineering-knowledge. The
+[portable execution policy](agent-execution-policy.md) owns authorization,
+replacement-first design, local-only checkpoints, CI observation and integrity.
+The [knowledge contract](../../README.md) and [publication contract](../../site/README.md)
+own domain and deployment semantics. No document grants extra authorization.
 
-It complements root `AGENTS.md`. It does not grant additional product, publication, deployment, cross-repository, or merge authorization.
+## Authority and resume
 
-## Authority
+Use current GitHub state and applicable repository-local policy first, then the
+owning Issue/checkpoint, then prior conversation or memory. GitHub is authoritative
+for refs, Issues, PRs, checks, reviews, rulesets and merge state; actual deployment
+and public artifacts are authoritative for publication claims.
 
-For execution recovery, use:
+Before mutation, read local policies, discover open PRs and the owning Issue,
+read its checkpoint and current refs/base/HEAD, check relevant enforcement,
+review and deployment state, compare with the checkpoint, and derive one next
+safe work unit. Classify MATCH, CHECKPOINT_STALE_BUT_RECONCILABLE,
+EXTERNAL_STATE_MISSING_RETRYABLE, CONFLICT or UNKNOWN. Material unknown or
+insufficient evidence fails closed.
 
-1. current GitHub execution state;
-2. current repository-local policy and accepted contracts;
-3. the active owning-Issue checkpoint;
-4. prior conversation or agent memory.
+## Durable checkpoint
 
-GitHub is authoritative for Issues, refs, commit SHAs, PRs, checks/workflows, reviews, rulesets/protection, merge state, and default-branch state. Publication/deployment claims additionally require the evidence appropriate to that surface.
+Use exactly one mutable owning-Issue comment identified by
+`<!-- agent-resume-checkpoint:v1 -->` when durable recovery is necessary.
+For purely local work follow the portable policy's local access-controlled record.
+Keep a latest-state snapshot, not a history log. Record owning item, stable
+work-unit identifier and phase, current branch/base/HEAD and PR, concise
+completed outcomes, last verified authority, verification/acceptance state,
+blockers, next safe work unit (scope, evidence and stop condition), and last
+mutation outcome. Do not commit mutable state to the production branch.
 
-A checkpoint is only a resume hint and never overrides current authority.
+Fresh-read comments before writing. Update the unique marker in place; create
+one only when absent and needed. Reconcile duplicates rather than creating
+another. Do not rewrite human decisions, review discussion or immutable evidence.
+One designated writer; use a lock/lease or version-checked atomic update where
+supported, confirm prior revision, otherwise single writer only. On conflict
+or uncertain write, reread authority, reconcile and STOP.
 
-## One canonical rolling checkpoint
+## Mutation and recovery
 
-For recoverable GitHub-tracked work, maintain one mutable comment on the owning Issue marked:
+A coherent work unit may contain multiple material mutations. Each requires
+fresh preconditions, bounded mutation, authoritative read-back and verified
+postcondition before checkpoint advancement. Continue inside the unit until its
+declared stop condition, or stop early on pending, conflict, failure or material
+unknown. Never replay a lost response blindly. Audit comprehensively before
+editing; consolidate replacements and affected consumers/tests/docs.
 
-`<!-- agent-resume-checkpoint:v1 -->`
+## Same-HEAD evidence after base advancement
 
-The checkpoint is a **latest-state snapshot, not an append-only log**.
+Any changed PR HEAD invalidates prior HEAD-specific CI/review proof. Do not
+relabel a synthetic merge run as HEAD-only proof. Before merge, fresh-read the
+owning item, current HEAD/base, required checks and provenance, live enforcement,
+review state and resolved mergeability; inspect the complete final candidate.
+Even if GitHub does not enforce a check, the repository's successful current
+Quartz Pages PR build is mandatory before merge.
 
-Keep only the state required to resume safely:
+If HEAD is unchanged but base advanced, record old/new base, exact HEAD,
+required-check SHA/event/provenance and result, current mergeability, both
+deltas, semantic-interaction judgment and live rules. Reuse evidence only
+when all required checks/reviews remain satisfied, proof applies to the actual
+unchanged input, no material interaction exists, and no gate requires current
+composition or updated base. Distinct filenames alone are insufficient:
+workflow, dependency/submodule, toolchain, source/projection, links,
+generated/publication artifacts and security changes can interact.
+A prior synthetic merge run proves only its old composition; obtain current
+composition proof where needed. Unknown mergeability or material interaction
+fails closed. No automatic rebase, reuse or rerun; record REUSE, REVALIDATE or
+BLOCKED_UNKNOWN and reason. Normal guarded merge must satisfy all live rules.
 
-- owning work item and current bounded work unit;
-- current phase;
-- branch/base and exact candidate/PR HEAD when relevant;
-- concise completed outcomes needed for context;
-- current verification/acceptance state;
-- blockers;
-- next safe action;
-- explicit STOP condition.
+## Completion and public privacy
 
-Replace or remove obsolete state. Do not accumulate old HEADs, repeated CI snapshots, per-turn notes, session handoffs, or chronological execution history. Git commits, PR history, Issue events, reviews, and deployment records already own that history.
+Merged is not automatically done. Verify default-branch tree, branch/PR
+housekeeping and applicable push/build/deployment evidence; reconcile owning
+Issue acceptance and central coordination. Stop at the selected work-unit
+boundary. A source-only change need not manufacture a deployment claim.
 
-Before writing checkpoint state:
-
-1. fresh-read Issue comments;
-2. locate the canonical marker;
-3. if exactly one exists, edit it in place;
-4. if none exists, create one only when durable recovery state is needed;
-5. if duplicates exist, do not add another; reconcile them first.
-
-Do not rewrite or delete human decisions, review discussion, or independently durable evidence merely to shorten the checkpoint.
-
-## Single writer and concurrent work
-
-The owning work item has one checkpoint writer at a time.
-
-Delegates may propose state but must not concurrently overwrite the checkpoint. Where version-checked compare-and-swap, a lock, or another coordination mechanism is available, use it. Otherwise operate as a single writer.
-
-Before replacing checkpoint state, confirm the prior state you are replacing. If a concurrent or uncertain write is detected, re-read GitHub, reconcile, and STOP. Never use last-writer-wins reasoning.
-
-If another actor moves a branch, PR, base, Issue ownership, workflow policy, or deployment state, current authoritative state wins after ownership is reconciled.
-
-## Resume protocol
-
-Before mutating resumed work:
-
-```text
-read AGENTS.md and applicable repository docs
--> discover open production PRs
--> identify owning Issue and canonical checkpoint
--> fresh-read current main / branch / PR HEAD / base
--> read checks, reviews, rulesets, protection, or deployment state when decision-relevant
--> compare checkpoint with authority
--> classify the mismatch
--> derive exactly one safe next work unit
-```
-
-Classify recovery as:
-
-- `MATCH`
-- `CHECKPOINT_STALE_BUT_RECONCILABLE`
-- `EXTERNAL_STATE_MISSING_RETRYABLE`
-- `CONFLICT`
-- `UNKNOWN`
-
-Material `UNKNOWN`, `UNVERIFIED`, or insufficient evidence fails closed.
-
-## Mutation protocol
-
-Every material external mutation follows:
-
-```text
-fresh precondition read
--> one bounded mutation
--> authoritative read-back
--> classify the postcondition
--> update the checkpoint only after verification
--> STOP at the authorized lifecycle boundary
-```
-
-If a response/session is lost after a create, branch move, PR mutation, merge, Pages/DNS change, or other external action, never repeat it solely because the checkpoint did not advance. Search/read authority first and determine whether the mutation succeeded, failed, conflicted, or remains unknown.
-
-## Exact-HEAD evidence
-
-Current PR HEAD is authoritative for HEAD-specific evidence.
-
-If PR HEAD changes, prior HEAD-specific CI/review evidence is invalid unless a repository contract explicitly defines another proof scope. Validate the new exact final HEAD before relying on it.
-
-Do not use branch names, old checkpoint SHAs, or a previous session's memory as a substitute for current GitHub ref state.
-
-## Base advancement with unchanged HEAD
-
-An unchanged PR HEAD does not automatically make old evidence valid or invalid after `main` advances.
-
-Before reusing evidence:
-
-1. fresh-read current PR HEAD, current base, mergeability, applicable required checks/rules, and review state;
-2. identify whether the evidence proves the immutable HEAD itself or an old base+HEAD/synthetic merge composition;
-3. inspect base and PR deltas for material semantic interaction;
-4. revalidate when current policy requires latest-base/current-composition proof or when the interaction is material/unknown.
-
-Material interaction includes, as applicable:
-
-- workflow, Pages, dependency/submodule, build/runtime, or validation changes;
-- knowledge-link validation or source/projection contract changes;
-- generated/publication artifacts or canonical URL behavior;
-- security/evidence-producing policy changes.
-
-Different filenames alone do not prove semantic independence.
-
-If the HEAD changes because of rebase, conflict resolution, branch update, regeneration, or another push, it is a new exact-HEAD proof unit.
-
-## CI observation and remediation
-
-CI observation is one bounded logical snapshot for the exact revision.
-
-Do not poll, wait-to-green, rerun-to-green, or automatically cross from observation into remediation.
-
-- running/queued -> `PENDING`, STOP;
-- missing/provenance unknown -> `UNVERIFIED` or `BLOCKED`, STOP;
-- failed -> `FAIL`, STOP unless remediation itself is the authorized work unit;
-- passed -> record only what the observed checks actually prove.
-
-Do not weaken validation, publication conditions, branch/ruleset enforcement, or tests to preserve old evidence or force success.
-
-## Public-repository privacy
-
-This repository is public. Checkpoints, Issues, PRs, comments, commits, and logs must therefore contain only public-safe execution metadata.
-
-Never store:
-
-- credentials, tokens, private keys, or secret values;
-- hidden reasoning or raw private prompts/transcripts;
-- personal secrets or unrelated private data;
-- confidential employer/customer/system topology;
-- sensitive provenance copied from private repositories merely to explain a public change.
-
-Use public-safe summaries and links only when the linked material is itself appropriate for public disclosure.
-
-## Completion
-
-Merged is not automatically done.
-
-Complete any required default-branch/post-merge verification, public artifact/deployment verification when applicable, linked-Issue acceptance, and housekeeping before marking the work item complete.
-
-Each individual authorization still stops at its separately defined lifecycle boundary.
+This repository is public. Use only public-safe metadata and evidence in
+commits, Issues, PRs, logs and checkpoints. No credentials, hidden reasoning,
+private prompts/transcripts, personal secrets, confidential employer/customer
+data or sensitive private-repository provenance.

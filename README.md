@@ -50,8 +50,9 @@ ox0
 4. backlink는 반대편 문서에 역링크를 중복 작성해서 만드는 것이 아니다. 실제 한쪽의 의미 있는 링크에서 Quartz가 파생한다.
 5. graph 밀도를 높이기 위한 억지 링크나 "문서당 최소 N개 링크" 규칙은 두지 않는다. 관계가 없으면 링크가 없어도 된다.
 6. 존재하지 않는 개념을 graph 채우기 목적으로 문서화하거나, 비슷한 이름의 다른 문서에 임의로 연결하지 않는다.
-7. CI는 로컬 Markdown 링크의 실제 대상 존재 여부와, Related에서 이미 존재하는 문서를 평문으로 남긴 경우를 검증한다. broken internal link는 merge 전에 실패해야 한다.
+7. CI는 Quartz의 lockfile로 설치한 Markdown parser를 사용해 공개 대상 문서의 상대경로 링크(참조형 포함)와 Related의 실제 문서 관계를 검증한다. 파일 존재만으로 공개 가능하다고 판단하지 않으며, 코드 예시는 링크로 해석하지 않는다. 대상 경로 검증이며 heading anchor 존재까지 보장하지 않는다. broken internal link는 merge 전에 실패해야 한다.
 8. Quartz의 graph/backlinks는 이 Markdown 관계를 보여주는 projection일 뿐이며, 관계의 source of truth는 문서 내용이다.
+9. 공개 대상은 README.md 및 concepts/, patterns/, systems/ 아래의 Markdown 문서다. README.md는 사이트 index로 투영되므로 다른 문서에서 README.md로 연결하는 대신 개별 문서 또는 현재 문서 anchor를 사용한다. Wiki link, raw HTML href/src, root-absolute/internal 비공개 경로, symlink 및 예상하지 못한 파일 유형은 허용하지 않는다. 새 asset 유형을 도입할 때는 검증과 projection 계약을 함께 갱신한다.
 
 ## 문서 상태
 

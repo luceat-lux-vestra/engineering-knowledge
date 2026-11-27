@@ -82,7 +82,7 @@ A. failure가 다른 영역으로 전파되는 경로와 blast radius를 제한�
 - Backpressure
 - Load Shedding
 - Retry Budget
-- State-Space Remediation
+- [State-Space Remediation](../patterns/state-space-remediation.md)
 
 ## Sources
 

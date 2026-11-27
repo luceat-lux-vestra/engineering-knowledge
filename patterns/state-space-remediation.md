@@ -82,7 +82,7 @@ A. 모든 remediation step의 위험/비용이 같지 않기 때문에 최소 st
 - State Machine
 - Automated Remediation
 - Control Plane
-- Progressive Collapse
+- [Progressive Collapse](../concepts/progressive-collapse.md)
 
 ## Sources
 
